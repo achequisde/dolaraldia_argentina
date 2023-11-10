@@ -1,0 +1,2 @@
+// For polymorphism
+class DataResponse {}
