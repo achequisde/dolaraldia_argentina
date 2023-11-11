@@ -1,7 +1,6 @@
 import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:dolaraldia_argentina/enums/rate.dart';
 import 'package:dolaraldia_argentina/providers/cubits/last_input_cubit.dart';
-import 'package:dolaraldia_argentina/providers/cubits/rate_cubit.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:dolaraldia_argentina/utils/ve_to_us.dart';
 import 'package:dolaraldia_argentina/widgets/home/add_button.dart';
@@ -22,7 +21,10 @@ class Calculator extends StatefulWidget {
 
   const Calculator({
     super.key,
+    required this.rate,
   });
+
+  final Rate rate;
 
   @override
   State<Calculator> createState() => _CalculatorState();
@@ -80,9 +82,7 @@ class _CalculatorState extends State<Calculator> {
             }),
     ];
 
-    final rate = BlocProvider.of<RateCubit>(context).state;
-
-    final selectedControllers = switch (rate) {
+    final selectedControllers = switch (widget.rate) {
       Rate.petro || Rate.btc || Rate.eth => [
           topCryptoFieldController,
           bottomCryptoFieldController,

@@ -32,7 +32,9 @@ class Content extends StatelessWidget {
               ),
               const Gap(10),
               // ignore: prefer_const_constructors
-              Calculator(),
+              Calculator(
+                rate: state,
+              ),
             ],
           );
         },
