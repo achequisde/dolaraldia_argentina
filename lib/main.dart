@@ -1,5 +1,8 @@
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
+import 'package:dolaraldia_argentina/pages/about_us.dart';
+import 'package:dolaraldia_argentina/pages/history.dart';
 import 'package:dolaraldia_argentina/pages/home.dart';
+import 'package:dolaraldia_argentina/pages/notifications.dart';
 import 'package:dolaraldia_argentina/utils/get_url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -30,11 +33,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+        ),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Dolar Al Dia'),
+      home: const MyHomePage(title: 'Dólar Al Día'),
     );
   }
 }
@@ -55,40 +60,94 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      final json = await getUrl();
-
-      print(ApiResponse.fromJson(json).dataBcv);
-    });
   }
+
+  var _currentIndex = 1;
+
+  final _titles = [
+    'Acerca De Nosotros',
+    'Dólar Al Día',
+    'Historial',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(
+          _titles[_currentIndex],
+        ),
         centerTitle: true,
         actions: [
-          // TODO: Move this to separate widget
-          PopupMenuButton(
-            itemBuilder: (context) {
-              return [
-                const PopupMenuItem(
-                  child: Icon(Icons.add),
+          if (_currentIndex == 1)
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {},
+            ),
+          if (_currentIndex == 2)
+            IconButton(
+              icon: const Icon(Icons.picture_as_pdf),
+              onPressed: () {},
+            ),
+          MenuAnchor(
+            builder: (context, controller, child) {
+              return IconButton(
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+                icon: const Icon(
+                  Icons.more_vert,
                 ),
-              ];
+              );
             },
-          )
+            menuChildren: [
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.notifications),
+                child: const Text('Notificaciones'),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const NotificationsPage();
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ],
       ),
-      body: const Home(),
+      body: SafeArea(
+        child: IndexedStack(
+          index: _currentIndex,
+          children: const [
+            AboutUs(),
+            Home(),
+            History(),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
+        onTap: (newIndex) {
+          setState(() {
+            _currentIndex = newIndex;
+          });
+        },
+        currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
             label: 'Acerca De',
             icon: Icon(Icons.question_mark_sharp),
+          ),
+          BottomNavigationBarItem(
+            label: 'Inicio',
+            icon: Icon(Icons.home),
           ),
           BottomNavigationBarItem(
             label: 'Historial',

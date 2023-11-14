@@ -39,12 +39,48 @@ const euroMetadata = (
 const petroMetadata = (
   // TextFormField metadata
   top: (
-    prefixText: '\$',
+    prefixText: '₽',
     hintText: 'PTR',
   ),
   bottom: (
     prefixText: 'Bs.',
     hintText: 'VES',
+  )
+);
+
+const btcMetadata = (
+  // TextFormField metadata
+  top: (
+    prefixText: '₿',
+    hintText: 'BTC',
+  ),
+  bottom: (
+    prefixText: '\$',
+    hintText: 'USD',
+  )
+);
+
+const ethMetadata = (
+  // TextFormField metadata
+  top: (
+    prefixText: 'Ξ',
+    hintText: 'ETH',
+  ),
+  bottom: (
+    prefixText: '\$',
+    hintText: 'USD',
+  )
+);
+
+const usdtMetadata = (
+  // TextFormField metadata
+  top: (
+    prefixText: '₮',
+    hintText: 'USDT',
+  ),
+  bottom: (
+    prefixText: '\$',
+    hintText: 'USD',
   )
 );
 
@@ -57,8 +93,8 @@ const petroMetadata = (
     Rate.paralelo => paraleloMetadata,
     Rate.euro => euroMetadata,
     Rate.petro => petroMetadata,
-    Rate.btc => bcvMetadata,
-    Rate.eth => bcvMetadata,
-    Rate.usdt => bcvMetadata,
+    Rate.btc => btcMetadata,
+    Rate.eth => ethMetadata,
+    Rate.usdt => usdtMetadata,
   };
 }

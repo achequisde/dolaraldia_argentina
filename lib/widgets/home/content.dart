@@ -1,5 +1,5 @@
 import 'package:dolaraldia_argentina/enums/rate.dart';
-import 'package:dolaraldia_argentina/providers/cubits/rate.dart';
+import 'package:dolaraldia_argentina/providers/calculator/rate.dart';
 import 'package:dolaraldia_argentina/widgets/home/calculator.dart';
 import 'package:dolaraldia_argentina/widgets/home/price_card.dart';
 import 'package:dolaraldia_argentina/widgets/home/swiper.dart';
@@ -24,12 +24,12 @@ class Content extends StatelessWidget {
               PriceCard(
                 rate: rate,
               ),
-              const Gap(10),
+              const Gap(15),
               const Swiper(
                 itemSize: 65,
                 gap: 0.19,
               ),
-              const Gap(10),
+              const Gap(15),
               Calculator(
                 rate: rate,
               ),

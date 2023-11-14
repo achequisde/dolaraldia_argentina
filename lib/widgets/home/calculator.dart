@@ -2,11 +2,11 @@ import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:dolaraldia_argentina/enums/rate.dart';
 import 'package:dolaraldia_argentina/helpers/get_current_data.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
-import 'package:dolaraldia_argentina/providers/cubits/api_data.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_api_input.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_api_value.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_crypto_input.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_crypto_value.dart';
+import 'package:dolaraldia_argentina/providers/calculator/api_data.dart';
+import 'package:dolaraldia_argentina/providers/calculator/last_api_input.dart';
+import 'package:dolaraldia_argentina/providers/calculator/last_api_value.dart';
+import 'package:dolaraldia_argentina/providers/calculator/last_crypto_input.dart';
+import 'package:dolaraldia_argentina/providers/calculator/last_crypto_value.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:dolaraldia_argentina/utils/ve_to_us.dart';
 import 'package:dolaraldia_argentina/widgets/home/add_button.dart';
@@ -14,6 +14,7 @@ import 'package:dolaraldia_argentina/widgets/home/calculator/clear_button.dart';
 import 'package:dolaraldia_argentina/widgets/home/calculator/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 class Calculator extends StatefulWidget {
   static const addButtonsValues = <String>[
@@ -167,16 +168,26 @@ class _CalculatorState extends State<Calculator> {
 
     return Column(
       children: [
-        InputField(
-          inputType: Input.top,
-          controller: selectedControllers[0],
-          isCrypto: isCrypto,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: InputField(
+            inputType: Input.top,
+            controller: selectedControllers[0],
+            isCrypto: isCrypto,
+            rate: widget.rate,
+          ),
         ),
-        InputField(
-          inputType: Input.bottom,
-          controller: selectedControllers[1],
-          isCrypto: isCrypto,
+        const Gap(10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: InputField(
+            inputType: Input.bottom,
+            controller: selectedControllers[1],
+            isCrypto: isCrypto,
+            rate: widget.rate,
+          ),
         ),
+        const Gap(15),
         Visibility(
           visible: !isCrypto,
           child: Wrap(
@@ -184,6 +195,7 @@ class _CalculatorState extends State<Calculator> {
             children: addButtons,
           ),
         ),
+        const Gap(10),
         ClearButton(
           onPressedCallback: clearButtonCallback,
         ),
