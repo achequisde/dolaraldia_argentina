@@ -11,6 +11,5 @@ class LastInputCubit extends Cubit<Input?> {
   @override
   void onChange(Change<Input?> change) {
     super.onChange(change);
-    print(change);
   }
 }

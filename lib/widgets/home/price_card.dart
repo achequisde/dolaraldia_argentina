@@ -1,7 +1,7 @@
 import 'package:dolaraldia_argentina/enums/rate.dart';
 import 'package:dolaraldia_argentina/helpers/get_current_data.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
-import 'package:dolaraldia_argentina/providers/cubits/api_data_cubit.dart';
+import 'package:dolaraldia_argentina/providers/cubits/api_data.dart';
 import 'package:dolaraldia_argentina/providers/cubits/rate_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

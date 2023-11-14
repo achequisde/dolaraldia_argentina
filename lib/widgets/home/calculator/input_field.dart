@@ -1,5 +1,5 @@
 import 'package:dolaraldia_argentina/enums/input.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_input_cubit.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_input.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

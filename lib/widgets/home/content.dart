@@ -1,5 +1,5 @@
 import 'package:dolaraldia_argentina/enums/rate.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_input_cubit.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_input.dart';
 import 'package:dolaraldia_argentina/providers/cubits/rate_cubit.dart';
 import 'package:dolaraldia_argentina/widgets/home/calculator.dart';
 import 'package:dolaraldia_argentina/widgets/home/price_card.dart';

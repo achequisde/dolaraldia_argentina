@@ -1,6 +1,6 @@
 import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:dolaraldia_argentina/enums/rate.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_input_cubit.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_input.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:dolaraldia_argentina/utils/ve_to_us.dart';
 import 'package:dolaraldia_argentina/widgets/home/add_button.dart';
