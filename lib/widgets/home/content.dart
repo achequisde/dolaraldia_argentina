@@ -1,6 +1,5 @@
 import 'package:dolaraldia_argentina/enums/rate.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_input.dart';
-import 'package:dolaraldia_argentina/providers/cubits/rate_cubit.dart';
+import 'package:dolaraldia_argentina/providers/cubits/rate.dart';
 import 'package:dolaraldia_argentina/widgets/home/calculator.dart';
 import 'package:dolaraldia_argentina/widgets/home/price_card.dart';
 import 'package:dolaraldia_argentina/widgets/home/swiper.dart';
@@ -18,12 +17,12 @@ class Content extends StatelessWidget {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: BlocBuilder<RateCubit, Rate>(
-        builder: (context, state) {
+        builder: (context, rate) {
           return Column(
             children: <Widget>[
               const Gap(20),
               PriceCard(
-                rate: state,
+                rate: rate,
               ),
               const Gap(10),
               const Swiper(
@@ -31,9 +30,8 @@ class Content extends StatelessWidget {
                 gap: 0.19,
               ),
               const Gap(10),
-              // ignore: prefer_const_constructors
               Calculator(
-                rate: state,
+                rate: rate,
               ),
             ],
           );

@@ -1,8 +1,8 @@
 import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LastInputCubit extends Cubit<Input?> {
-  LastInputCubit() : super(null);
+class LastApiInputCubit extends Cubit<Input?> {
+  LastApiInputCubit() : super(null);
 
   void setTop() => emit(Input.top);
   void setBottom() => emit(Input.bottom);

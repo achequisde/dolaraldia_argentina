@@ -4,8 +4,11 @@ import 'package:dolaraldia_argentina/interfaces/data_response.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
 import 'package:dolaraldia_argentina/models/api/invalid_response.dart';
 import 'package:dolaraldia_argentina/providers/cubits/api_data.dart';
-import 'package:dolaraldia_argentina/providers/cubits/last_input.dart';
-import 'package:dolaraldia_argentina/providers/cubits/rate_cubit.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_api_input.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_api_value.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_crypto_input.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_crypto_value.dart';
+import 'package:dolaraldia_argentina/providers/cubits/rate.dart';
 import 'package:dolaraldia_argentina/utils/get_url.dart';
 import 'package:dolaraldia_argentina/widgets/home/content.dart';
 import 'package:flutter/material.dart';
@@ -51,10 +54,22 @@ class _HomeState extends State<Home> {
                       create: (context) => RateCubit(),
                     ),
                     BlocProvider(
-                      create: (context) =>
-                          ApiDataCubit(snapshot.data ?? InvalidResponse()),
+                      create: (context) => ApiDataCubit(
+                        snapshot.data ?? InvalidResponse(),
+                      ),
                     ),
-                    BlocProvider(create: (context) => LastInputCubit()),
+                    BlocProvider(
+                      create: (context) => LastCryptoInputCubit(),
+                    ),
+                    BlocProvider(
+                      create: (context) => LastCryptoValueCubit(),
+                    ),
+                    BlocProvider(
+                      create: (context) => LastApiInputCubit(),
+                    ),
+                    BlocProvider(
+                      create: (context) => LastApiValueCubit(),
+                    ),
                   ],
                   child: const Content(),
                 );

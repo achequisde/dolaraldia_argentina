@@ -1,8 +1,7 @@
-import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LastValueCubit extends Cubit<String?> {
-  LastValueCubit() : super(null);
+class LastCryptoValueCubit extends Cubit<String?> {
+  LastCryptoValueCubit() : super(null);
 
   void update(String val) => emit(val);
   void reset() => emit(null);

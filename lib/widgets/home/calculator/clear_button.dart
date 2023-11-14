@@ -1,4 +1,4 @@
-import 'package:dolaraldia_argentina/providers/cubits/last_input.dart';
+import 'package:dolaraldia_argentina/providers/cubits/last_api_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
