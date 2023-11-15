@@ -6,6 +6,7 @@ import 'package:dolaraldia_argentina/pages/notifications.dart';
 import 'package:dolaraldia_argentina/utils/get_url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -33,11 +34,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-        ),
+        brightness: Brightness.dark,
         useMaterial3: true,
       ),
+      localizationsDelegates: const [
+        GlobalWidgetsLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es', 'VE'),
+        Locale('en', 'US'),
+      ],
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Dólar Al Día'),
     );

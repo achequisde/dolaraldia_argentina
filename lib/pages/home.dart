@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dolaraldia_argentina/helpers/get_api_data.dart';
 import 'package:dolaraldia_argentina/interfaces/data_response.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
 import 'package:dolaraldia_argentina/models/api/invalid_response.dart';
@@ -9,7 +10,6 @@ import 'package:dolaraldia_argentina/providers/calculator/last_api_value.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_crypto_input.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_crypto_value.dart';
 import 'package:dolaraldia_argentina/providers/calculator/rate.dart';
-import 'package:dolaraldia_argentina/utils/get_url.dart';
 import 'package:dolaraldia_argentina/widgets/home/content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +29,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _apiResponse = getUrl().then((value) => ApiResponse.fromJson(value));
+    _apiResponse = getApiData().then((value) => ApiResponse.fromJson(value));
   }
 
   @override
@@ -37,7 +37,8 @@ class _HomeState extends State<Home> {
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {
-          _apiResponse = getUrl().then((value) => ApiResponse.fromJson(value));
+          _apiResponse =
+              getApiData().then((value) => ApiResponse.fromJson(value));
         });
       },
       child: FutureBuilder(

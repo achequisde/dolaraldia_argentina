@@ -3,6 +3,7 @@ import 'package:dolaraldia_argentina/helpers/get_current_data.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
 import 'package:dolaraldia_argentina/providers/calculator/api_data.dart';
 import 'package:dolaraldia_argentina/providers/calculator/rate.dart';
+import 'package:dolaraldia_argentina/utils/capitalize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -113,7 +114,7 @@ class Info extends StatelessWidget {
     );
 
     final contentWidget = Text(
-      '${content.substring(0, 1).toUpperCase()}${content.substring(1)}',
+      content.capitalize(),
       style: Theme.of(context).textTheme.bodyLarge,
     );
 
