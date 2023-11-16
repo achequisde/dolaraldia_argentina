@@ -1,12 +1,16 @@
 import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:dolaraldia_argentina/enums/rate.dart';
+import 'package:dolaraldia_argentina/helpers/get_current_crypto_data.dart';
 import 'package:dolaraldia_argentina/helpers/get_current_data.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
+import 'package:dolaraldia_argentina/models/api/rate_data.dart';
 import 'package:dolaraldia_argentina/providers/calculator/api_data.dart';
+import 'package:dolaraldia_argentina/providers/calculator/crypto_data.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_api_input.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_api_value.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_crypto_input.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_crypto_value.dart';
+import 'package:dolaraldia_argentina/utils/crypto_to_us.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:dolaraldia_argentina/utils/ve_to_us.dart';
 import 'package:dolaraldia_argentina/widgets/home/add_button.dart';
@@ -76,34 +80,46 @@ class _CalculatorState extends State<Calculator> {
 
   @override
   Widget build(BuildContext context) {
-    final isCrypto = switch (widget.rate) {
+    final isCryptoWithPetro = switch (widget.rate) {
       Rate.petro || Rate.btc || Rate.eth => true,
       _ => false,
     };
 
-    final data = getCurrentData(
-        BlocProvider.of<ApiDataCubit>(context).state as ApiResponse,
-        widget.rate);
+    final isCrypto = switch (widget.rate) {
+      Rate.btc || Rate.eth || Rate.usdt => true,
+      _ => false,
+    };
 
-    void updateCryptoValue() {
+    late final RateData currentData;
+
+    if (isCrypto) {
+      final data = BlocProvider.of<CryptoDataCubit>(context).state;
+      currentData = RateData.fromCryptoRateData(
+          getCurrentCryptoData(data, widget.rate), data.timestamp);
+    } else {
+      final data = BlocProvider.of<ApiDataCubit>(context).state as ApiResponse;
+      currentData = getCurrentData(data, widget.rate);
+    }
+
+    void updateCryptoLastValue() {
       final lastValue = BlocProvider.of<LastCryptoValueCubit>(context).state;
 
       if (lastValue != null) {
         final lastInput = BlocProvider.of<LastCryptoInputCubit>(context).state;
 
-        final newValue = double.parse(lastValue) / 100;
-
         if (lastInput == Input.top) {
+          final newValue = double.parse(lastValue) / 10e5;
           bottomCryptoFieldController.text =
-              usToVeDecimal(newValue * veToUsDecimal(data.price));
+              usToVeDecimal(newValue * veToUsDecimal(currentData.price));
         } else if (lastInput == Input.bottom) {
+          final newValue = double.parse(lastValue) / 100;
           topCryptoFieldController.text =
-              usToVeDecimal(newValue / veToUsDecimal(data.price));
+              cryptoToUsDecimal(newValue / veToUsDecimal(currentData.price));
         }
       }
     }
 
-    void updateApiValue() {
+    void updateApiLastValue() {
       final lastValue = BlocProvider.of<LastApiValueCubit>(context).state;
 
       if (lastValue != null) {
@@ -113,20 +129,20 @@ class _CalculatorState extends State<Calculator> {
 
         if (lastInput == Input.top) {
           bottomApiFieldController.text =
-              usToVeDecimal(newValue * veToUsDecimal(data.price));
+              usToVeDecimal(newValue * veToUsDecimal(currentData.price));
         } else if (lastInput == Input.bottom) {
           topApiFieldController.text =
-              usToVeDecimal(newValue / veToUsDecimal(data.price));
+              usToVeDecimal(newValue / veToUsDecimal(currentData.price));
         }
       }
     }
 
-    switch (isCrypto) {
+    switch (isCryptoWithPetro) {
       case true:
-        updateCryptoValue();
+        updateCryptoLastValue();
         break;
       default:
-        updateApiValue();
+        updateApiLastValue();
         break;
     }
 
@@ -146,7 +162,7 @@ class _CalculatorState extends State<Calculator> {
 
             topApiFieldController.text = usToVeDecimal(sum);
             bottomApiFieldController.text =
-                usToVeDecimal(sum * veToUsDecimal(data.price));
+                usToVeDecimal(sum * veToUsDecimal(currentData.price));
 
             BlocProvider.of<LastApiValueCubit>(context)
                 .update(sumWithoutPeriods);
@@ -155,7 +171,7 @@ class _CalculatorState extends State<Calculator> {
         ),
     ];
 
-    final selectedControllers = switch (isCrypto) {
+    final selectedControllers = switch (isCryptoWithPetro) {
       true => [
           topCryptoFieldController,
           bottomCryptoFieldController,
@@ -166,6 +182,109 @@ class _CalculatorState extends State<Calculator> {
         ],
     };
 
+    void onTopFieldTapCallback() {
+      if (isCryptoWithPetro) {
+        final lastCryptoInput =
+            BlocProvider.of<LastCryptoInputCubit>(context).state;
+
+        if (lastCryptoInput == Input.bottom) {
+          selectedControllers[0].clear();
+          selectedControllers[1].clear();
+        }
+
+        BlocProvider.of<LastCryptoInputCubit>(context).setTop();
+      } else {
+        final lastCryptoInput =
+            BlocProvider.of<LastApiInputCubit>(context).state;
+
+        if (lastCryptoInput == Input.bottom) {
+          selectedControllers[0].clear();
+          selectedControllers[1].clear();
+        }
+
+        BlocProvider.of<LastApiInputCubit>(context).setTop();
+      }
+
+      selectedControllers[0].selection = TextSelection.fromPosition(
+        TextPosition(
+          offset: selectedControllers[0].text.length,
+        ),
+      );
+    }
+
+    void onBottomFieldTapCallback() {
+      if (isCryptoWithPetro) {
+        final lastCryptoInput =
+            BlocProvider.of<LastCryptoInputCubit>(context).state;
+
+        if (lastCryptoInput == Input.top) {
+          selectedControllers[0].clear();
+          selectedControllers[1].clear();
+        }
+
+        BlocProvider.of<LastCryptoInputCubit>(context).setBottom();
+      } else {
+        final lastCryptoInput =
+            BlocProvider.of<LastApiInputCubit>(context).state;
+
+        if (lastCryptoInput == Input.top) {
+          selectedControllers[0].clear();
+          selectedControllers[1].clear();
+        }
+
+        BlocProvider.of<LastApiInputCubit>(context).setBottom();
+      }
+
+      selectedControllers[1].selection = TextSelection.fromPosition(
+        TextPosition(
+          offset: selectedControllers[1].text.length,
+        ),
+      );
+    }
+
+    void onTopFieldChangedCallback(String? value) {
+      if (isCryptoWithPetro) {
+        BlocProvider.of<LastCryptoValueCubit>(context).update(value!);
+      } else {
+        BlocProvider.of<LastApiValueCubit>(context).update(value!);
+      }
+
+      late final double n;
+
+      if (isCryptoWithPetro) {
+        n = (double.tryParse(value) ?? 0) / 10e5;
+        selectedControllers[0].text = cryptoToUsDecimal(n);
+      } else {
+        n = (double.tryParse(value) ?? 0) / 100;
+        selectedControllers[0].text = usToVeDecimal(n);
+      }
+
+      selectedControllers[1].text = usToVeDecimal(
+        n * veToUsDecimal(currentData.price),
+      );
+    }
+
+    void onBottomFieldChangedCallback(String? value) {
+      if (isCryptoWithPetro) {
+        BlocProvider.of<LastCryptoValueCubit>(context).update(value!);
+      } else {
+        BlocProvider.of<LastApiValueCubit>(context).update(value!);
+      }
+
+      final n = (double.tryParse(value) ?? 0) / 100;
+      selectedControllers[1].text = usToVeDecimal(n);
+
+      if (isCryptoWithPetro) {
+        selectedControllers[0].text = cryptoToUsDecimal(
+          n / veToUsDecimal(currentData.price),
+        );
+      } else {
+        selectedControllers[0].text = usToVeDecimal(
+          n / veToUsDecimal(currentData.price),
+        );
+      }
+    }
+
     return Column(
       children: [
         Padding(
@@ -173,7 +292,9 @@ class _CalculatorState extends State<Calculator> {
           child: InputField(
             inputType: Input.top,
             controller: selectedControllers[0],
-            isCrypto: isCrypto,
+            isCryptoWithPetro: isCryptoWithPetro,
+            onTapCallback: onTopFieldTapCallback,
+            onChangedCallback: onTopFieldChangedCallback,
             rate: widget.rate,
           ),
         ),
@@ -183,13 +304,15 @@ class _CalculatorState extends State<Calculator> {
           child: InputField(
             inputType: Input.bottom,
             controller: selectedControllers[1],
-            isCrypto: isCrypto,
+            isCryptoWithPetro: isCryptoWithPetro,
+            onTapCallback: onBottomFieldTapCallback,
+            onChangedCallback: onBottomFieldChangedCallback,
             rate: widget.rate,
           ),
         ),
         const Gap(15),
         Visibility(
-          visible: !isCrypto,
+          visible: !isCryptoWithPetro,
           child: Wrap(
             runSpacing: 10.0,
             children: addButtons,

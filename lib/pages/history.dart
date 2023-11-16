@@ -1,5 +1,5 @@
 import 'package:dolaraldia_argentina/enums/history_rate.dart';
-import 'package:dolaraldia_argentina/helpers/get_api_history_data.dart';
+import 'package:dolaraldia_argentina/helpers/get_api_history.dart';
 import 'package:dolaraldia_argentina/utils/capitalize.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:dolaraldia_argentina/widgets/history/list_entry.dart';
@@ -27,7 +27,7 @@ class _HistoryState extends State<History> {
   var entries = <Widget>[];
 
   void historySearchButtonCallback() async {
-    final response = await getApiHistoryData(
+    final response = await getApiHistory(
       currentDropdownValue,
       startDate,
       searchByRange ? endDate : startDate,

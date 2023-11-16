@@ -24,7 +24,7 @@ final _headers = {
   'Authorization': '$_accessServer $_accessKeyServer',
 };
 
-Future<HistoryResponse?> getApiHistoryData(
+Future<HistoryResponse?> getApiHistory(
   HistoryRate rate,
   DateTime startDate,
   DateTime endDate,

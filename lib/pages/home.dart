@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:dolaraldia_argentina/helpers/get_api_data.dart';
+import 'package:dolaraldia_argentina/helpers/get_crypto_data.dart';
 import 'package:dolaraldia_argentina/interfaces/data_response.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
 import 'package:dolaraldia_argentina/models/api/invalid_response.dart';
+import 'package:dolaraldia_argentina/models/crypto/crypto_response.dart';
 import 'package:dolaraldia_argentina/providers/calculator/api_data.dart';
+import 'package:dolaraldia_argentina/providers/calculator/crypto_data.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_api_input.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_api_value.dart';
 import 'package:dolaraldia_argentina/providers/calculator/last_crypto_input.dart';
@@ -25,11 +28,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late Future<DataResponse> _apiResponse;
+  late Future<CryptoResponse> _cryptoResponse;
 
   @override
   void initState() {
     super.initState();
     _apiResponse = getApiData().then((value) => ApiResponse.fromJson(value));
+    _cryptoResponse = getCryptoData().then((value) => value!);
   }
 
   @override
@@ -39,10 +44,16 @@ class _HomeState extends State<Home> {
         setState(() {
           _apiResponse =
               getApiData().then((value) => ApiResponse.fromJson(value));
+          _cryptoResponse = getCryptoData().then((value) => value!);
         });
       },
       child: FutureBuilder(
-        future: _apiResponse,
+        future: Future.wait(
+          [
+            _apiResponse,
+            _cryptoResponse,
+          ],
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
@@ -54,7 +65,12 @@ class _HomeState extends State<Home> {
                   ),
                   BlocProvider(
                     create: (context) => ApiDataCubit(
-                      snapshot.data ?? InvalidResponse(),
+                      (snapshot.data?[0] as DataResponse),
+                    ),
+                  ),
+                  BlocProvider(
+                    create: (context) => CryptoDataCubit(
+                      (snapshot.data?[1] as CryptoResponse),
                     ),
                   ),
                   BlocProvider(

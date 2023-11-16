@@ -1,7 +1,10 @@
 import 'package:dolaraldia_argentina/enums/rate.dart';
+import 'package:dolaraldia_argentina/helpers/get_current_crypto_data.dart';
 import 'package:dolaraldia_argentina/helpers/get_current_data.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
+import 'package:dolaraldia_argentina/models/api/rate_data.dart';
 import 'package:dolaraldia_argentina/providers/calculator/api_data.dart';
+import 'package:dolaraldia_argentina/providers/calculator/crypto_data.dart';
 import 'package:dolaraldia_argentina/providers/calculator/rate.dart';
 import 'package:dolaraldia_argentina/utils/capitalize.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +21,21 @@ class PriceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = BlocProvider.of<ApiDataCubit>(context).state as ApiResponse;
+    final isCrypto = switch (rate) {
+      Rate.btc || Rate.eth || Rate.usdt => true,
+      _ => false,
+    };
 
-    final currentData = getCurrentData(data, rate);
+    late final RateData currentData;
+
+    if (isCrypto) {
+      final data = BlocProvider.of<CryptoDataCubit>(context).state;
+      currentData =
+          RateData.fromCryptoRateData(getCurrentCryptoData(data, rate), data.timestamp);
+    } else {
+      final data = BlocProvider.of<ApiDataCubit>(context).state as ApiResponse;
+      currentData = getCurrentData(data, rate);
+    }
 
     final price = currentData.price;
     final date = currentData.date;

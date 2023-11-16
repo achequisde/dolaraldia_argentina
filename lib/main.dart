@@ -1,14 +1,13 @@
-import 'package:dolaraldia_argentina/models/api/api_response.dart';
 import 'package:dolaraldia_argentina/pages/about_us.dart';
 import 'package:dolaraldia_argentina/pages/history.dart';
 import 'package:dolaraldia_argentina/pages/home.dart';
 import 'package:dolaraldia_argentina/pages/notifications.dart';
-import 'package:dolaraldia_argentina/utils/get_url.dart';
+import 'package:dolaraldia_argentina/themes/dark_theme.dart';
+import 'package:dolaraldia_argentina/themes/light_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.env');
@@ -18,10 +17,25 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     super.key,
   });
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var currentTheme = ThemeMode.light;
+
+  void toggleTheme() {
+    final isDark = currentTheme == ThemeMode.dark;
+
+    setState(() {
+      currentTheme = isDark ? ThemeMode.light : ThemeMode.dark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +47,9 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: currentTheme,
       localizationsDelegates: const [
         GlobalWidgetsLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -47,7 +60,10 @@ class MyApp extends StatelessWidget {
         Locale('en', 'US'),
       ],
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Dólar Al Día'),
+      home: MyHomePage(
+          title: 'Dólar Al Día',
+          theme: currentTheme,
+          changeThemeCallback: toggleTheme),
     );
   }
 }
@@ -56,9 +72,13 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({
     super.key,
     required this.title,
+    required this.changeThemeCallback,
+    required this.theme,
   });
 
   final String title;
+  final Function() changeThemeCallback;
+  final ThemeMode theme;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -70,9 +90,10 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  var _currentIndex = 1;
+  var currentIndex = 1;
+  var theme = Brightness.light;
 
-  final _titles = [
+  final titles = [
     'Acerca De Nosotros',
     'Dólar Al Día',
     'Historial',
@@ -82,18 +103,26 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.onBackground,
         title: Text(
-          _titles[_currentIndex],
+          titles[currentIndex],
         ),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            widget.theme == ThemeMode.light
+                ? Icons.dark_mode_outlined
+                : Icons.light_mode_outlined,
+          ),
+          onPressed: widget.changeThemeCallback,
+        ),
         actions: [
-          if (_currentIndex == 1)
+          if (currentIndex == 1)
             IconButton(
               icon: const Icon(Icons.share),
               onPressed: () {},
             ),
-          if (_currentIndex == 2)
+          if (currentIndex == 2)
             IconButton(
               icon: const Icon(Icons.picture_as_pdf),
               onPressed: () {},
@@ -133,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SafeArea(
         child: IndexedStack(
-          index: _currentIndex,
+          index: currentIndex,
           children: const [
             AboutUs(),
             Home(),
@@ -144,10 +173,10 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: (newIndex) {
           setState(() {
-            _currentIndex = newIndex;
+            currentIndex = newIndex;
           });
         },
-        currentIndex: _currentIndex,
+        currentIndex: currentIndex,
         items: const [
           BottomNavigationBarItem(
             label: 'Acerca De',

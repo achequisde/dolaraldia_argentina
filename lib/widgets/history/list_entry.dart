@@ -1,4 +1,5 @@
 import 'package:dolaraldia_argentina/enums/history_rate.dart';
+import 'package:dolaraldia_argentina/enums/rate.dart';
 import 'package:dolaraldia_argentina/models/history/history_entry.dart';
 import 'package:dolaraldia_argentina/pages/emergent_calculator.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
@@ -34,7 +35,9 @@ class HistoryListEntry extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) {
-                      return EmergentCalculatorPage();
+                      return EmergentCalculatorPage(
+                        rate: Rate.values[rate.index],
+                      );
                     },
                   ),
                 );

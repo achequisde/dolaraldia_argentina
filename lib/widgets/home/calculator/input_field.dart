@@ -1,14 +1,8 @@
 import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:dolaraldia_argentina/enums/rate.dart';
 import 'package:dolaraldia_argentina/helpers/get_rate_metadata.dart';
-import 'package:dolaraldia_argentina/providers/calculator/last_api_input.dart';
-import 'package:dolaraldia_argentina/providers/calculator/last_api_value.dart';
-import 'package:dolaraldia_argentina/providers/calculator/last_crypto_input.dart';
-import 'package:dolaraldia_argentina/providers/calculator/last_crypto_value.dart';
-import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
@@ -16,44 +10,20 @@ class InputField extends StatelessWidget {
     required this.inputType,
     required this.controller,
     required this.rate,
-    required this.isCrypto,
+    required this.isCryptoWithPetro,
+    required this.onTapCallback,
+    required this.onChangedCallback,
   });
 
   final Input inputType;
   final TextEditingController controller;
   final Rate rate;
-  final bool isCrypto;
+  final bool isCryptoWithPetro;
+  final Function() onTapCallback;
+  final Function(String?) onChangedCallback;
 
   @override
   Widget build(BuildContext context) {
-    void onTapHandler() {
-      if (isCrypto) {
-        switch (inputType) {
-          case Input.top:
-            BlocProvider.of<LastCryptoInputCubit>(context).setTop();
-            break;
-          case Input.bottom:
-            BlocProvider.of<LastCryptoInputCubit>(context).setBottom();
-            break;
-        }
-      } else {
-        switch (inputType) {
-          case Input.top:
-            BlocProvider.of<LastApiInputCubit>(context).setTop();
-            break;
-          case Input.bottom:
-            BlocProvider.of<LastApiInputCubit>(context).setBottom();
-            break;
-        }
-      }
-
-      controller.selection = TextSelection.fromPosition(
-        TextPosition(
-          offset: controller.text.length,
-        ),
-      );
-    }
-
     final meta = getRateMetadata(rate);
 
     final metadata = switch (inputType) {
@@ -65,18 +35,9 @@ class InputField extends StatelessWidget {
       borderRadius: BorderRadius.circular(20.0),
       child: TextFormField(
         controller: controller,
-        onTap: onTapHandler,
+        onTap: onTapCallback,
         textAlign: TextAlign.end,
-        onChanged: (value) {
-          if (isCrypto) {
-            BlocProvider.of<LastCryptoValueCubit>(context).update(value);
-          } else {
-            BlocProvider.of<LastApiValueCubit>(context).update(value);
-          }
-
-          final n = (double.tryParse(value) ?? 0) / 100;
-          controller.text = usToVeDecimal(n);
-        },
+        onChanged: onChangedCallback,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
@@ -88,7 +49,7 @@ class InputField extends StatelessWidget {
             borderRadius: BorderRadius.circular(20.0),
           ),
           filled: true,
-          fillColor: Theme.of(context).colorScheme.onPrimary,
+          fillColor: Theme.of(context).colorScheme.onBackground,
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0),
               borderSide: const BorderSide(
