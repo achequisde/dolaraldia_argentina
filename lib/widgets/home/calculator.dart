@@ -287,34 +287,30 @@ class _CalculatorState extends State<Calculator> {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: InputField(
-            inputType: Input.top,
-            controller: selectedControllers[0],
-            isCryptoWithPetro: isCryptoWithPetro,
-            onTapCallback: onTopFieldTapCallback,
-            onChangedCallback: onTopFieldChangedCallback,
-            rate: widget.rate,
-          ),
+        InputField(
+          inputType: Input.top,
+          controller: selectedControllers[0],
+          isCryptoWithPetro: isCryptoWithPetro,
+          onTapCallback: onTopFieldTapCallback,
+          onChangedCallback: onTopFieldChangedCallback,
+          rate: widget.rate,
         ),
-        const Gap(10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: InputField(
-            inputType: Input.bottom,
-            controller: selectedControllers[1],
-            isCryptoWithPetro: isCryptoWithPetro,
-            onTapCallback: onBottomFieldTapCallback,
-            onChangedCallback: onBottomFieldChangedCallback,
-            rate: widget.rate,
-          ),
+        const Gap(20),
+        InputField(
+          inputType: Input.bottom,
+          controller: selectedControllers[1],
+          isCryptoWithPetro: isCryptoWithPetro,
+          onTapCallback: onBottomFieldTapCallback,
+          onChangedCallback: onBottomFieldChangedCallback,
+          rate: widget.rate,
         ),
         const Gap(15),
         Visibility(
           visible: !isCryptoWithPetro,
           child: Wrap(
-            runSpacing: 10.0,
+            alignment: WrapAlignment.spaceEvenly,
+            runAlignment: WrapAlignment.spaceEvenly,
+            spacing: 5.0,
             children: addButtons,
           ),
         ),

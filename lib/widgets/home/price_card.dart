@@ -1,6 +1,8 @@
 import 'package:dolaraldia_argentina/enums/rate.dart';
+import 'package:dolaraldia_argentina/utils/copy_to_clipboard.dart';
 import 'package:dolaraldia_argentina/helpers/get_current_crypto_data.dart';
 import 'package:dolaraldia_argentina/helpers/get_current_data.dart';
+import 'package:dolaraldia_argentina/helpers/get_rate_icon_path.dart';
 import 'package:dolaraldia_argentina/models/api/api_response.dart';
 import 'package:dolaraldia_argentina/models/api/rate_data.dart';
 import 'package:dolaraldia_argentina/providers/calculator/api_data.dart';
@@ -9,6 +11,7 @@ import 'package:dolaraldia_argentina/providers/calculator/rate.dart';
 import 'package:dolaraldia_argentina/utils/capitalize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 
 class PriceCard extends StatelessWidget {
@@ -21,6 +24,8 @@ class PriceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tooltipKey = GlobalKey<TooltipState>();
+
     final isCrypto = switch (rate) {
       Rate.btc || Rate.eth || Rate.usdt => true,
       _ => false,
@@ -30,8 +35,8 @@ class PriceCard extends StatelessWidget {
 
     if (isCrypto) {
       final data = BlocProvider.of<CryptoDataCubit>(context).state;
-      currentData =
-          RateData.fromCryptoRateData(getCurrentCryptoData(data, rate), data.timestamp);
+      currentData = RateData.fromCryptoRateData(
+          getCurrentCryptoData(data, rate), data.timestamp);
     } else {
       final data = BlocProvider.of<ApiDataCubit>(context).state as ApiResponse;
       currentData = getCurrentData(data, rate);
@@ -54,13 +59,20 @@ class PriceCard extends StatelessWidget {
       _ => Colors.grey,
     };
 
-    final title = Text(
-      'Precio Actual',
-      style: Theme.of(context).textTheme.headlineSmall,
+    const title = Expanded(
+      child: Text(
+        'Precio Actual',
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 22.0,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
     );
 
     final priceWidget = Text(
-      price,
+      '${isCrypto ? '\$' : 'Bs.'} $price',
       style: Theme.of(context).textTheme.displaySmall,
     );
 
@@ -73,34 +85,74 @@ class PriceCard extends StatelessWidget {
 
     return Column(
       children: [
-        title,
-        const Gap(10),
+        Row(
+          children: [
+            const Gap(26.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: SvgPicture.asset(
+                'assets/logo_dolar_al_dia.svg',
+                fit: BoxFit.contain,
+                height: 32.0,
+              ),
+            ),
+            title,
+            IconButton(
+              onPressed: () {
+                // goToUrl();
+              },
+              icon: Image.asset(
+                getRateIconPath(rate),
+                fit: BoxFit.contain,
+                height: 32.0,
+              ),
+            ),
+            const Gap(26.0),
+          ],
+        ),
+        const Gap(20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             priceWidget,
+            const Gap(4.0),
+            Tooltip(
+              message: '¡Copiado!',
+              showDuration: const Duration(milliseconds: 100),
+              key: tooltipKey,
+              triggerMode: TooltipTriggerMode.manual,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.copy_rounded,
+                  size: 20.0,
+                ),
+                onPressed: () async {
+                  await copyToClipBoard(tooltipKey, price);
+                },
+              ),
+            ),
             Icon(
               icon,
-              size: 32.0,
+              size: 16.0,
               color: color,
             ),
             percentWidget,
           ],
         ),
-        const Gap(10),
+        const Gap(20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Info(
-              description: 'Cambio:',
+              description: 'Tasa:',
               content: BlocProvider.of<RateCubit>(context).state.name,
             ),
             Info(
-              description: 'Fecha',
+              description: 'Fecha:',
               content: date,
             ),
             Info(
-              description: 'Hora',
+              description: 'Hora:',
               content: hour,
             ),
           ],
@@ -125,7 +177,9 @@ class Info extends StatelessWidget {
   Widget build(BuildContext context) {
     final descriptionWidget = Text(
       description,
-      style: Theme.of(context).textTheme.bodyLarge,
+      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+            fontSize: 16.0,
+          ),
     );
 
     final contentWidget = Text(

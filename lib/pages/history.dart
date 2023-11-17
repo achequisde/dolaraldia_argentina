@@ -1,7 +1,10 @@
 import 'package:dolaraldia_argentina/enums/history_rate.dart';
 import 'package:dolaraldia_argentina/helpers/get_api_history.dart';
+import 'package:dolaraldia_argentina/models/history/history_date_group.dart';
+import 'package:dolaraldia_argentina/models/history/history_response.dart';
 import 'package:dolaraldia_argentina/utils/capitalize.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
+import 'package:dolaraldia_argentina/widgets/history/date_field.dart';
 import 'package:dolaraldia_argentina/widgets/history/list_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -24,9 +27,9 @@ class _HistoryState extends State<History> {
   var searchByRange = false;
   var showGraph = false;
 
-  var entries = <Widget>[];
+  Future<List<HistoryDateGroup>?> historyEntries = Future.value(null);
 
-  void historySearchButtonCallback() async {
+  Future<List<HistoryDateGroup>?> historySearchButtonCallback() async {
     final response = await getApiHistory(
       currentDropdownValue,
       startDate,
@@ -34,29 +37,10 @@ class _HistoryState extends State<History> {
     );
 
     if (response == null || response.priceDataHistory == null) {
-      setState(() {
-        entries = [
-          const Center(
-            child: Text('No se encontraron resultados.'),
-          )
-        ];
-      });
-
-      return;
+      return [];
     }
 
-    final histories = [
-      for (final dateGroup in response!.priceDataHistory!) dateGroup.priceData
-    ];
-
-    final widgets = [
-      for (final entry in histories)
-        for (final data in entry) HistoryListEntry(data: data, rate: currentDropdownValue,)
-    ];
-
-    setState(() {
-      entries = widgets;
-    });
+    return response.priceDataHistory;
   }
 
   void onDropdownChangeCallback(HistoryRate? newValue) {
@@ -78,6 +62,11 @@ class _HistoryState extends State<History> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -86,7 +75,7 @@ class _HistoryState extends State<History> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.25,
+              width: MediaQuery.of(context).size.width * 0.25,
               child: const Text(
                 'Buscar\npor rango',
                 textAlign: TextAlign.center,
@@ -148,105 +137,42 @@ class _HistoryState extends State<History> {
         ),
         const Gap(10),
         HistorySearchButton(
-          onPressedHandler: historySearchButtonCallback,
+          onPressedHandler: () {
+            setState(() {
+              historyEntries = historySearchButtonCallback();
+            });
+          },
         ),
         const Gap(10),
-        Expanded(
-          child: HistoryEntries(entries: entries),
+        FutureBuilder(
+          future: historyEntries,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.data == null) {
+                return Container();
+              } else if (snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text(
+                      'No hay resultados para mostrar para el rango indicado.'),
+                );
+              } else {
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return HistoryEntriesGroup(
+                          dateGroup: snapshot.data![index],
+                          rate: currentDropdownValue);
+                    },
+                  ),
+                );
+              }
+            } else {
+              return const CircularProgressIndicator.adaptive();
+            }
+          },
         ),
       ],
-    );
-  }
-}
-
-class HistoryDateField extends StatelessWidget {
-  const HistoryDateField({
-    super.key,
-    required this.date,
-    required this.onDatePickerCallback,
-    this.enabled = true,
-  });
-
-  final DateTime date;
-  final Function(DateTime) onDatePickerCallback;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = TextEditingController(text: date.toVEDate());
-
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.45,
-      child: TextFormField(
-        controller: controller,
-        enabled: enabled,
-        enableInteractiveSelection: false,
-        readOnly: true,
-        textAlign: TextAlign.center,
-        onTap: () async {
-          DateTime? picked = await showDatePicker(
-            context: context,
-            initialDate: date,
-            firstDate: DateTime(2021, 10, 18),
-            lastDate: DateTime.now(),
-            locale: const Locale('es', 'VE'),
-            initialEntryMode: DatePickerEntryMode.calendarOnly,
-            builder: (context, child) {
-              return FittedBox(
-                child: Theme(
-                  data: ThemeData(
-                    brightness: Theme.of(context).brightness,
-                    colorScheme: Theme.of(context).colorScheme,
-                    datePickerTheme: DatePickerThemeData(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
-                      headerBackgroundColor:
-                          Theme.of(context).colorScheme.background,
-                      headerForegroundColor:
-                          Theme.of(context).colorScheme.onSurface,
-                      backgroundColor: Theme.of(context).colorScheme.background,
-                      elevation: 10.0,
-                    ),
-                  ),
-                  child: child!,
-                ),
-              );
-            },
-          );
-
-          if (picked != null) {
-            onDatePickerCallback(picked);
-          }
-        },
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.only(left: 16.0),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-            borderSide:
-                BorderSide(color: Theme.of(context).colorScheme.onSurface),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-            borderSide: const BorderSide(
-              color: Colors.redAccent,
-              width: 1.0,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-            borderSide: const BorderSide(
-              color: Colors.redAccent,
-              width: 1.0,
-            ),
-          ),
-          labelText: 'Inicio',
-          floatingLabelBehavior: FloatingLabelBehavior.auto,
-          floatingLabelAlignment: FloatingLabelAlignment.center,
-        ),
-      ),
     );
   }
 }
@@ -264,6 +190,49 @@ class HistorySearchButton extends StatelessWidget {
     return FilledButton.tonal(
       onPressed: onPressedHandler,
       child: const Text('BUSCAR'),
+    );
+  }
+}
+
+class HistoryEntriesGroup extends StatelessWidget {
+  const HistoryEntriesGroup({
+    super.key,
+    required this.dateGroup,
+    required this.rate,
+  });
+
+  final HistoryDateGroup dateGroup;
+  final HistoryRate rate;
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = [
+      for (final entry in dateGroup.priceData)
+        HistoryListEntry(data: entry, rate: rate)
+    ];
+
+    final title = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.calendar_month),
+        const Gap(10.0),
+        Text(
+          dateGroup.dateGroup,
+          style: const TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+
+    return Column(
+      children: [
+        title,
+        const Gap(5.0),
+        ...entries,
+        const Gap(20.0),
+      ],
     );
   }
 }

@@ -18,22 +18,33 @@ class Content extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       child: BlocBuilder<RateCubit, Rate>(
         builder: (context, rate) {
-          return Column(
-            children: <Widget>[
-              const Gap(20),
-              PriceCard(
-                rate: rate,
-              ),
-              const Gap(15),
-              const Swiper(
-                itemSize: 65,
-                gap: 0.19,
-              ),
-              const Gap(15),
-              Calculator(
-                rate: rate,
-              ),
-            ],
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0,),
+            child: Column(
+              children: <Widget>[
+                const Gap(20),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onBackground,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  padding: const EdgeInsets.all(8.0),
+                  child: PriceCard(
+                    rate: rate,
+                  ),
+                ),
+                const Gap(20),
+                const Swiper(
+                  itemSize: 65,
+                  gap: 0.19,
+                ),
+                const Gap(20),
+                Calculator(
+                  rate: rate,
+                ),
+                const Gap(20),
+              ],
+            ),
           );
         },
       ),

@@ -1,5 +1,6 @@
 import 'package:dolaraldia_argentina/enums/input.dart';
 import 'package:dolaraldia_argentina/enums/rate.dart';
+import 'package:dolaraldia_argentina/utils/copy_to_clipboard.dart';
 import 'package:dolaraldia_argentina/helpers/get_rate_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +26,7 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final meta = getRateMetadata(rate);
+    final tooltipKey = GlobalKey<TooltipState>();
 
     final metadata = switch (inputType) {
       Input.top => meta.top,
@@ -34,11 +36,14 @@ class InputField extends StatelessWidget {
     return Material(
       borderRadius: BorderRadius.circular(20.0),
       child: TextFormField(
+        // For iOS
+        cursorOpacityAnimates: false,
         controller: controller,
         onTap: onTapCallback,
         textAlign: TextAlign.end,
         onChanged: onChangedCallback,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        keyboardType:
+            const TextInputType.numberWithOptions(decimal: true, signed: true),
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],
@@ -56,14 +61,22 @@ class InputField extends StatelessWidget {
                 color: Colors.transparent,
                 width: 0.6,
               )),
-          suffixIcon: TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              shape: const CircleBorder(),
-            ),
-            child: Icon(
-              Icons.copy_rounded,
-              color: Theme.of(context).colorScheme.onSurface,
+          suffixIcon: Tooltip(
+            message: '¡Copiado!',
+            showDuration: const Duration(milliseconds: 100),
+            key: tooltipKey,
+            triggerMode: TooltipTriggerMode.manual,
+            child: TextButton(
+              onPressed: () async {
+                await copyToClipBoard(tooltipKey, controller.text);
+              },
+              style: TextButton.styleFrom(
+                shape: const CircleBorder(),
+              ),
+              child: Icon(
+                Icons.copy_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
           hintText: metadata.hintText,

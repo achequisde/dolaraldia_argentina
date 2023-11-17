@@ -20,14 +20,14 @@ class HistoryListEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text('Bs. ${data.price}'),
-      leading: Text(DateTime.parse(data.date).toVEDate()),
+      leading: Text(data.hour),
       trailing: FittedBox(
         child: Row(
           children: [
             Text(data.valuePercent),
             const Gap(20),
             IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.calculate,
                 size: 30.0,
               ),
@@ -37,6 +37,7 @@ class HistoryListEntry extends StatelessWidget {
                     builder: (context) {
                       return EmergentCalculatorPage(
                         rate: Rate.values[rate.index],
+                        data: data.price,
                       );
                     },
                   ),

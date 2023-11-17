@@ -25,7 +25,6 @@ const paraleloMetadata = (
 );
 
 const euroMetadata = (
-  // TextFormField metadata
   top: (
     prefixText: '€',
     hintText: 'EUR',
