@@ -10,6 +10,7 @@ import 'package:dolaraldia_argentina/utils/ve_to_us.dart';
 import 'package:dolaraldia_argentina/widgets/home/calculator/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 
 class EmergentCalculatorPage extends StatefulWidget {
@@ -77,15 +78,21 @@ class _EmergentCalculatorPageState extends State<EmergentCalculatorPage> {
       );
     }
 
-    const title = Text('Dólar Al Día');
-    final price = Text('Bs. $historyPrice');
+    final title = Text(
+      'Dólar Al Día',
+      style: Theme.of(context).textTheme.displaySmall,
+    );
+    final price = Text(
+      'Bs. $historyPrice',
+      style: Theme.of(context).textTheme.displaySmall,
+    );
 
     final dataRow = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         IconLabel(
           icon: Icons.currency_exchange,
-          text: rateName,
+          text: rateName.capitalize(),
         ),
         IconLabel(
           icon: Icons.calendar_today,
@@ -101,38 +108,60 @@ class _EmergentCalculatorPageState extends State<EmergentCalculatorPage> {
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
-        child: Column(
-          children: [
-            title,
-            price,
-            dataRow,
-            InputField(
-              inputType: Input.top,
-              controller: topController,
-              rate: Rate.values[widget.rate.index],
-              isCryptoWithPetro: false,
-              onTapCallback: topOnTapCallback,
-              onChangedCallback: topOnChangedCallback,
-            ),
-            const Gap(20),
-            InputField(
-              inputType: Input.bottom,
-              controller: bottomController,
-              rate: Rate.values[widget.rate.index],
-              isCryptoWithPetro: false,
-              onTapCallback: bottomOnTapCallback,
-              onChangedCallback: bottomOnChangedCallback,
-            ),
-            FilledButton.tonal(
-              onPressed: () {
-                lastInput = null;
-
-                topController.clear();
-                bottomController.clear();
-              },
-              child: const Text('LIMPIAR'),
-            )
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SvgPicture.asset(
+                'assets/logo_dolar_al_dia.svg',
+                height: 120.0,
+                fit: BoxFit.contain,
+              ),
+              const Gap(10.0),
+              title,
+              const Gap(10.0),
+              price,
+              const Gap(20.0),
+              dataRow,
+              const Gap(30.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                ),
+                child: InputField(
+                  inputType: Input.top,
+                  controller: topController,
+                  rate: Rate.values[widget.rate.index],
+                  isCryptoWithPetro: false,
+                  onTapCallback: topOnTapCallback,
+                  onChangedCallback: topOnChangedCallback,
+                ),
+              ),
+              const Gap(20.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                ),
+                child: InputField(
+                  inputType: Input.bottom,
+                  controller: bottomController,
+                  rate: Rate.values[widget.rate.index],
+                  isCryptoWithPetro: false,
+                  onTapCallback: bottomOnTapCallback,
+                  onChangedCallback: bottomOnChangedCallback,
+                ),
+              ),
+              const Gap(40.0),
+              FilledButton.tonal(
+                onPressed: () {
+                  lastInput = null;
+        
+                  topController.clear();
+                  bottomController.clear();
+                },
+                child: const Text('LIMPIAR'),
+              )
+            ],
+          ),
         ),
       ),
     );
