@@ -13,7 +13,7 @@ import 'package:dolaraldia_argentina/providers/calculator/last_crypto_value.dart
 import 'package:dolaraldia_argentina/utils/crypto_to_us.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:dolaraldia_argentina/utils/ve_to_us.dart';
-import 'package:dolaraldia_argentina/widgets/home/add_button.dart';
+import 'package:dolaraldia_argentina/widgets/home/calculator/add_button.dart';
 import 'package:dolaraldia_argentina/widgets/home/calculator/clear_button.dart';
 import 'package:dolaraldia_argentina/widgets/home/calculator/input_field.dart';
 import 'package:flutter/material.dart';

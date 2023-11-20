@@ -48,6 +48,15 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   test: ^1.24.3
+  shared_preferences: ^2.2.2
+  sqflite: ^2.3.0
+  fl_chart: ^0.64.0
+  shimmer: ^3.0.0
+  path: ^1.8.3
+  share_plus: ^7.2.1
+  screenshot: ^2.1.0
+  path_provider: ^2.1.1
+  permission_handler: ^11.0.1
 
 dev_dependencies:
   flutter_test:
