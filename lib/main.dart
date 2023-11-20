@@ -2,9 +2,11 @@ import 'package:dolaraldia_argentina/pages/about_us.dart';
 import 'package:dolaraldia_argentina/pages/history.dart';
 import 'package:dolaraldia_argentina/pages/home.dart';
 import 'package:dolaraldia_argentina/pages/notifications.dart';
+import 'package:dolaraldia_argentina/providers/history/last_dropdown.dart';
 import 'package:dolaraldia_argentina/themes/dark_theme.dart';
 import 'package:dolaraldia_argentina/themes/light_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
@@ -163,10 +165,13 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SafeArea(
         child: IndexedStack(
           index: currentIndex,
-          children: const [
-            AboutUs(),
-            Home(),
-            History(),
+          children: [
+            const AboutUs(),
+            const Home(),
+            BlocProvider(
+              create: (context) => LastDropdownCubit(),
+              child: const History(),
+            ),
           ],
         ),
       ),

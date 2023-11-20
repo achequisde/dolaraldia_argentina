@@ -5,9 +5,4 @@ class LastCryptoValueCubit extends Cubit<String?> {
 
   void update(String val) => emit(val);
   void reset() => emit(null);
-
-  @override
-  void onChange(Change<String?> change) {
-    super.onChange(change);
-  }
 }

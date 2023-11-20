@@ -7,9 +7,4 @@ class LastCryptoInputCubit extends Cubit<Input?> {
   void setTop() => emit(Input.top);
   void setBottom() => emit(Input.bottom);
   void reset() => emit(null);
-
-  @override
-  void onChange(Change<Input?> change) {
-    super.onChange(change);
-  }
 }

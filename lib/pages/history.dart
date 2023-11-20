@@ -3,6 +3,7 @@ import 'package:dolaraldia_argentina/helpers/create_date_validator.dart';
 import 'package:dolaraldia_argentina/helpers/get_api_history.dart';
 import 'package:dolaraldia_argentina/models/history/history_date_group.dart';
 import 'package:dolaraldia_argentina/models/history/history_response.dart';
+import 'package:dolaraldia_argentina/providers/history/last_dropdown.dart';
 import 'package:dolaraldia_argentina/utils/capitalize.dart';
 import 'package:dolaraldia_argentina/utils/us_to_ve.dart';
 import 'package:dolaraldia_argentina/utils/ve_to_us.dart';
@@ -12,6 +13,7 @@ import 'package:dolaraldia_argentina/widgets/history/dropdown.dart';
 import 'package:dolaraldia_argentina/widgets/history/search_entry.dart';
 import 'package:dolaraldia_argentina/widgets/history/search_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 class History extends StatefulWidget {
@@ -72,10 +74,10 @@ class _HistoryState extends State<History> {
   @override
   Widget build(BuildContext context) {
     final topFieldValidatorCallback =
-        createDateValidatorCallback((p0) => p0.isAfter(endDate) && searchByRange);
+        createDateValidator((p0) => p0.isAfter(endDate) && searchByRange);
 
     final bottomFieldValidatorCallback =
-        createDateValidatorCallback((p0) => p0.isBefore(startDate));
+        createDateValidator((p0) => p0.isBefore(startDate));
 
     final historyOptionsCard = Column(
       children: [
@@ -151,6 +153,8 @@ class _HistoryState extends State<History> {
         const Gap(10),
         HistorySearchButton(
           onPressedHandler: () {
+            BlocProvider.of<LastDropdownCubit>(context)
+                .update(currentDropdownValue);
             setState(() {
               historyEntries = historySearchButtonCallback();
             });
@@ -165,7 +169,7 @@ class _HistoryState extends State<History> {
       builder: (context, snapshot) {
         late final dynamic historyDateGroups;
         Widget? chart;
-
+    
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data == null) {
             historyDateGroups = SliverToBoxAdapter(
@@ -195,24 +199,24 @@ class _HistoryState extends State<History> {
                     entryData.hour
                   )
             ];
-
+    
             final prices = chartData.map((e) => e.$1).toList();
             final dates = chartData.map((e) => e.$2).toList();
             final hours = chartData.map((e) => e.$3).toList();
-
+    
             chart = Chart(
               prices: prices,
               dates: dates,
               hours: hours,
               isCrypto: false,
             );
-
+    
             historyDateGroups = SliverList.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 return HistoryEntriesGroup(
                   dateGroup: snapshot.data![index],
-                  rate: currentDropdownValue,
+                  rate: BlocProvider.of<LastDropdownCubit>(context).state!,
                 );
               },
             );
@@ -222,7 +226,7 @@ class _HistoryState extends State<History> {
             child: CircularProgressIndicator.adaptive(),
           );
         }
-
+    
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
